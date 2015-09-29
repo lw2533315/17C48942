@@ -2,7 +2,7 @@
 <configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles" displayName="头文件" projectFiles="true">
-      <itemPath>linkedlist.h</itemPath>
+      <itemPath>linkedlist1.h</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles" displayName="源文件" projectFiles="true">
       <itemPath>main.cpp</itemPath>
@@ -31,7 +31,7 @@
       </toolsSet>
       <compileType>
       </compileType>
-      <item path="linkedlist.h" ex="false" tool="3" flavor2="0">
+      <item path="linkedlist1.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>
@@ -56,7 +56,7 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="linkedlist.h" ex="false" tool="3" flavor2="0">
+      <item path="linkedlist1.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
       </item>

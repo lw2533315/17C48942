@@ -1,12 +1,21 @@
 /* 
+ * File:   linkedlist1.h
+ * Author: Administrator
+ *
+ * Created on 2015年9月29日, 上午10:31
+ */
+
+#ifndef LINKEDLIST1_H
+#define	LINKEDLIST1_H
+
+/* 
  * File:   linkedlist.h
  * Author: Administrator
  *
  * Created on 2015年9月25日, 下午6:13
  */
 
-#ifndef LINKEDLIST_H
-#define	LINKEDLIST_H
+
 #include<iostream>
 #include<new>
 #include<cstdlib>
@@ -19,8 +28,7 @@ private:
     struct Node {
         T node;
         Node *nodeN;
-
-        Node(const T&a = 0, Node*p = 0) : node(a), nodeN(p) {
+        Node(const T &a = 0, Node*p = 0) : node(a), nodeN(p) {
         } //struct constructor, nodeN 
         //defaut value is 0
     };
@@ -52,10 +60,13 @@ SimpleV<T>::SimpleV() {
 
 template <typename T>
 SimpleV<T>::SimpleV(int n) {
+    
     front = rear = 0;
     listSize = useSize = 0;
+    
     if (n >= 1) {
-        front = rear = new Node();
+        front = new Node();
+        rear=front;
         useSize = listSize = 1;
         while (n > 1) {
             rear->nodeN = new Node();
@@ -65,12 +76,12 @@ SimpleV<T>::SimpleV(int n) {
             useSize++;
         }
     }
-}
+    }
 
 template<typename T>
 T & SimpleV<T>::operator[](const int &sub) {//【】参数必须是const
     //    cout<<sub<<endl;
-    if (sub < 0 || sub >= listSize)
+    if (sub < 0 || sub >= useSize)
         subError();
     else {
         Node *temp = front;
@@ -104,60 +115,67 @@ SimpleV<T>::~SimpleV() {//delete front the front
         while (listSize > 0) {
             Node *temp = front;
             front = front->nodeN;
-            delete temp;
             listSize--;
-            useSize--;
-        }
+            delete temp;
+            }
     }
-
 }
 
 template <typename T>
 void SimpleV<T>::push_back(T t) {
-    if (front != 0) {
-        rear->nodeN = new Node(t);
+    if(useSize<listSize){
+        cout<<"rear node = "<<rear->node<<endl;
         rear = rear->nodeN;
-        listSize++;
+        rear->node=t;
+//        rear->node=t;
+//        rear=rear->nodeN;
         useSize++;
-    } else {
-        front = new Node(t);
-        rear = front;
-        listSize++;
-        useSize++;
+    }else {
+        if(listSize!=0){
+//            cout<<"rearnode"<<rear->node<<endl;
+            rear->nodeN=new Node(t);
+            
+            
+             rear=rear->nodeN;
+            Node*temp=rear;
+           
+            for(int i=0;i<listSize-1;i++){
+                
+                temp->nodeN=new Node();
+                temp=temp->nodeN;
+            }
+            useSize++;
+            listSize*=2;
+
+        }
+        else{
+            front=rear=new Node(t);
+            useSize=listSize=1;
+
+        }
     }
 }
-
 template <typename T>
 void SimpleV<T>::pop_back() {
-    if (listSize == 0)
-        empError();
-    else if (listSize == 1) {
-        delete front;
-        front = rear = 0;
-        listSize--;
+    if(useSize>0){
+        cout<<"use siez"<<useSize<<endl;
         useSize--;
-    } else if (listSize == 2) {
-        delete rear;
-        rear = front;
-        rear->nodeN = 0;
-        listSize--;
-        useSize--;
-    } else {
-        Node* temp = front;
-        int index = listSize;
-        while (index > 2) {
-            temp = temp->nodeN;
-            index--;
+        rear=front;
+        for(int i=0;i<useSize-1;i++){
+            cout<<"i = "<<i<<endl;
+            rear=rear->nodeN;            
         }
-        rear = temp;
-        delete rear->nodeN;
-        rear->nodeN = 0;
-        listSize--;
-        useSize--;
-    }
+        cout<<rear->node<<endl;
+        
+    }else
+        empError();
 }
 
 
 
 #endif	/* LINKEDLIST_H */
+
+
+
+
 
