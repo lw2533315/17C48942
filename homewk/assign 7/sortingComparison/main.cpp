@@ -142,26 +142,26 @@ void merge(vector<T>&hilow, int beg, int nlow, int nhigh, int&countMrg) {
     //Fill the array
     countMrg++; //i=0
     for (int i = 0; i < span; i++) {
-        countMrg += 2; //i< and i++
+        countMrg += 3; //i< and i++
         countMrg++; //if
         if (cntl == nlow) {
-            countMrg += 4; //assign
+            countMrg += 5; //assign
             c[i] = hilow[cnth++];
         } else if (cnth == nhigh) {
-            countMrg += 5; //if 
+            countMrg += 6; //if 
             c[i] = hilow[cntl++];
         } else if (hilow[cntl] < hilow[cnth]) {
-            countMrg += 8;
+            countMrg += 9;
             c[i] = hilow[cntl++];
         } else {
-            countMrg += 8;
+            countMrg += 9;
             c[i] = hilow[cnth++];
         }
     }
     //Copy back and deallocate memory
     countMrg++; //i=0
     for (int i = 0; i < span; i++) {
-        countMrg += 6; //for loop
+        countMrg += 7; //for loop
         hilow[beg + i] = c[i];
     }
 }
@@ -172,9 +172,9 @@ void bubble(vector<T>p, int l, int&countBub) {
     countBub++; //lower count;
     countBub++; //i count;    
     for (int i = 0; i < l; i++) {
-        countBub += 3; //j, i<1,i++ 
+        countBub += 4; //j, i<1,i++ 
         for (int j = 0; j < lowerL; j++) {
-            countBub+=2; //j<lowerLj++
+            countBub+=3; //j<lowerLj++
             countBub+=4; //if();
             if (p[j + 1] < p[j]) {
                 Swap(p[j + 1], p[j]);
@@ -189,9 +189,9 @@ template<class T>
 void selection(vector<T>p, int l, int&countSel) {
     countSel++; //i=0
     for (int i = 0; i < l; i++) {
-        countSel += 3; //j=i,i<l,i++
+        countSel += 4; //j=i,i<l,i++
         for (int j = i; j < l; j++) {
-            countSel += 5; //j<l,j++,if
+            countSel += 6; //j<l,j++,if
             if (p[i] > p[j]) {
                 countSel += 9; //swap
                 Swap(p[j], p[i]);
@@ -214,24 +214,24 @@ void quickSort(vector<T>&s, int l, int r, int&countQik) {
             while (i < j && s[j] >= x) // 从右向左找第一个小于x的数  
             {
                 j--;
-                countQik++; //j--
+                countQik+=2; //j--
             }
             countQik++; //if
             if (i < j) //这里判断i<j,上面while循环有可能条件同时打破
             {
                 s[i++] = s[j];
-                countQik += 4; // assign and ++
+                countQik += 5; // assign and ++
             }
             countQik += 3; //i<j and s<x
             while (i < j && s[i] < x) // 从左向右找第一个大于等于x的数  
             {
                 i++;
-                countQik++; //i++
+                countQik+=2; //i++
             }
             countQik++; //if
             if (i < j) {
                 s[j--] = s[i];
-                countQik += 4; //assign and j--
+                countQik += 5; //assign and j--
             }
         }
         countQik+=2; //assign
@@ -245,14 +245,14 @@ template<class T>
 void heapSort(vector<T>& p, int size, int&countHep) {
     countHep++; //
     for (int i = size - 1; i >= 0; i--) {
-        countHep += 3; //
+        countHep += 4; //
         heapRebuild(p, i, size, countHep);
     }
     countHep+=2; //
     int last = size - 1;
     countHep++; //
     for (int i = 1; i <= size; i++, last--) {
-        countHep += 4;
+        countHep += 5;
         
         countHep+=7;
         int temp = p[0];
