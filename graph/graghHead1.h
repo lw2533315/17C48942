@@ -20,7 +20,7 @@ const int INFINITE = 999999;
 
 struct arcNode {
     int weight;
-    int desVertex; //arc destinate vertex
+    int desVertex; //arc destinate vertex,index
     arcNode *next;
 };
 
@@ -41,8 +41,8 @@ class DiGraph {
 private:
     headNode* p; //for dijkstra, kruskals;
     //    headNode* p_search; //for DFS list table;
-    vector<pair<pair<int, int>, int> >* tree_kru;
-    vector<pair<pair<int, int>, int> >* tree_pri;
+    vector<pair<pair<int, int>, int> >* tree_kru;//for minimum spanning kru
+    vector<pair<pair<int, int>, int> >* tree_pri;//for minimum spanning prime 
     vector<pair<pair<int, int>, int> >*backup; //store the arc information
     vector<pair<pair<int, int>, int> >*backup1; //for no direction graph' arc
     int nodeNum;
@@ -57,6 +57,7 @@ public:
     const int printDist(int);
     void Kruskals();
     void Dfs_traverse(int);
+    void DfsStack(headNode*,vector<int>&v,vector<int>&r);
     void Bfs_traverse(int);
     void setArc(headNode*pT, const vector<pair<pair<int, int>, int> >* b);
 };
@@ -65,8 +66,15 @@ public:
  */
 
 void DiGraph::setArc(headNode*pT, const vector<pair<pair<int, int>, int> >* b) {
+//    cout<<"test input vecotor"<<endl;
+//    for(int i=0;i<b->size();i++){
+//        cout<<(*b)[i].first.first<<" : "<<(*b)[i].first.second
+//        <<"  weight"<<(*b)[i].second<<endl;
+//    }
     int begin, end, weight;
     for (int i = 0; i < b->size(); i++) {
+        cout<<(*b)[i].first.first<<" : "<<(*b)[i].first.second
+        <<"  weight"<<(*b)[i].second<<endl;
         begin = (*b)[i].first.first;
         end = (*b)[i].first.second;
         weight = (*b)[i].second;
@@ -77,6 +85,12 @@ void DiGraph::setArc(headNode*pT, const vector<pair<pair<int, int>, int> >* b) {
         pT[begin - 1].link = node; //insert the newest arc into the head
         pT[end - 1].inDegree += 1;
     }
+//    cout<<"test inDegree of vertex"<<endl;
+//        for (int i = 0; i < nodeNum; i++) {
+//        cout << p[i].inDegree << " ";
+//    }
+//    cout << endl;
+
 }
 
 DiGraph::DiGraph(int nNum, int aNum) {
@@ -87,7 +101,7 @@ DiGraph::DiGraph(int nNum, int aNum) {
     backup1 = new vector<pair<pair<int, int>, int> >(); //for no direction graph
     //    p_search = new headNode [nodeNum];
     ifstream ifs;
-    ifs.open("input.txt");
+    ifs.open("dfs.txt");
     //    cout<<"after open file"<<endl;
     nodeNum = nNum;
     arcNum = aNum;
@@ -105,7 +119,7 @@ DiGraph::DiGraph(int nNum, int aNum) {
             ifs >> begin >> end>> weight;
             //            cout << begin << " " << end << " " << weight << endl;
             backup->push_back(make_pair(make_pair(begin, end), weight));
-            backup1->push_back(make_pair(make_pair(begin, end), weight));
+            backup1->push_back(make_pair(make_pair(end, begin), weight));
 
             //            tree_pri->push_back(make_pair(make_pair(begin, end), weight));
             //            arcNode* node = new arcNode;
@@ -137,69 +151,91 @@ DiGraph::~DiGraph() {
         p[i].link = NULL;
     }
     delete [] p;
-    //    for (int i = 0; i < nodeNum; i++) {
-    //        arcNode * temp = p_search[i].link;
-    //        while (temp) {
-    //            arcNode* temp1 = temp->next;
-    //            delete temp;
-    //            temp = temp1;
-    //        }
-    //        p_search[i].link = NULL;
-    //    }
-    //    delete [] p_search;
 }
-
+void DiGraph::DfsStack(headNode* h, vector<int>& v, vector<int>&r){
+    if(r.size()==nodeNum)
+        return;
+    else{
+        int distance=INFINITE;
+        int end;//target vertex;
+        int index=v.size()-1;//当前点的下标
+        arcNode*dTemp=h[v[index]-1].link->next;
+        cout<<"headnode's name is "<<h[v[index]-1].nodeName<<endl;
+        while(dTemp!=false){//不为空时查找距离最小且未被使用的点
+            int dest=dTemp->desVertex;//目标的下标
+            cout<<"substript is "<<dTemp->desVertex<<endl;
+            if(h[dest].isKnown==false&&dTemp->weight<distance){
+                distance=dTemp->weight;
+                cout<<"distance is "<<distance<<endl;
+//                h[dest].isKnown=true;
+                end=dest+1;
+                cout<<"next possible node is "<<end<<endl;
+            }
+           dTemp=dTemp->next;
+        }
+      
+      
+        if(distance==INFINITE){//未发现路径回退一格
+            cout<<"no path"<<endl;
+            v.pop_back();
+            DfsStack(h,v,r);
+        }else{//发现路径
+            cout<<"get path"<<endl;
+              h[end-1].isKnown=true;//找到最小路径不要忘记标记为已经路过
+                cout<<end-1<<" 小标 is "<<"true"<<endl;
+            r.push_back(end);
+            v.push_back(end);
+            DfsStack(h,v,r);
+        }
+        
+    }
+}
 void DiGraph::Dfs_traverse(int start) {
     headNode* headTemp = new headNode [nodeNum];
     for (int i = 0; i < nodeNum; i++) {
         headTemp[i].inDegree = 0;
         headTemp[i].nodeName = i + 1;
         headTemp[i].preNode = -2; //-1mean self to self, -2 mean error
+        headTemp[i].isKnown=false;//true means 使用过了
         headTemp[i].link = NULL;
     }
     //    setArc(headTemp,backup);
     for (int i = 0; i < backup->size(); i++) {
         backup1->push_back((*backup)[i]);
     }
-    cout << backup1->size() << endl;
+   
+ 
     setArc(headTemp, backup1);
-    //    cout<<"test"<<endl;
-
-    //    for (int i = 0; i < backup->size(); i++) {
-    //        cout << "test2~~~~~~~~~~~~~~" << endl;
-    //        arcTemp->push_back((*backup)[i]);
-    //        cout << "test3 ~~~~~~~~~~~~~~~" << endl;
-    //        arcTemp->push_back(make_pair(make_pair((*backup)[i].first.first,
-    //                (*backup)[i].first.second), (*backup)[i].second));
-    //
-    //    }
-    //    cout << arcTemp->size() << endl;
-    //    setArc(headTemp, arcTemp);
-    for (int i = 0; i < nodeNum; i++) {
-        cout << p[i].inDegree << " ";
+     for(int i=0;i<nodeNum;i++){
+        cout<<headTemp[i].inDegree<<" ";
     }
-    cout << endl;
+//       cout<<endl;
+//    for(int i=0;i<backup1->size();i++){
+//        cout<<(*backup1)[i].first.first<<" : "<<(*backup1)[i].first.second<<" w: "<<(*backup1)[i].second<<endl;
+//    }
+    vector<int> dfsV;
+    vector<int>dfsR;
+    dfsV.push_back(start);//it is a stack，便于后进先出
+    dfsR.push_back(start);//store the dfs 结果
+    headTemp[start-1].isKnown=true;
+    DfsStack(headTemp,dfsV,dfsR);
+    for(int i=0;i<dfsR.size();i++)
+        cout<<dfsR[i]<<" ";
+    cout<<endl;
+    
 
 
 
-    //test
-    for (int i = 0; i < nodeNum; i++) {
-        cout << headTemp[i].inDegree << " ";
-    }
-    cout << endl;
-
-
-
-
-    for (int i = 0; i < nodeNum; i++) {
-        arcNode * temp = headTemp[i].link;
-        while (temp) {
-            arcNode* temp1 = temp->next;
-            delete temp;
-            temp = temp1;
-        }
-        headTemp[i].link = NULL;
-    }
+//why here can not delete the pointer ?
+//    for (int i = 0; i < nodeNum; i++) {
+//        arcNode * temp = headTemp[i].link;
+//        while (temp) {
+//            arcNode* temp1 = temp->next;
+//            delete temp;
+//            temp = temp1;
+//        }
+//        headTemp[i].link = NULL;
+//    }delete [] headTemp;
 }
 
 void DiGraph::Bfs_traverse(int start) {
@@ -217,12 +253,7 @@ void DiGraph::Kruskals() {
         tree_kru->push_back((*backup)[i]);
     }
     sort(tree_kru->begin(), tree_kru->end(), cmp);
-    //    cout << "test tree_kru" << endl;
-    //    for (int i = 0; i < tree_kru->size(); i++) {
-    //        cout << (*tree_kru)[i].first.first << " : " << (*tree_kru)[i].first.second << endl;
-    //    }
     vector<pair<pair<int, int>, int> > temp;
-    //    int count = 1;
     vector<set<int> >vSet;
     temp.push_back((*tree_kru)[0]);
     set<int> sTemp;
@@ -313,7 +344,7 @@ const int DiGraph::getWeight(int begin, int end) {
 
 void DiGraph::Dijkstra(int start) {
     //initiat all headnodes
-    cout << "~~~~~~test" << endl;
+//    cout << "~~~~~~test" << endl;
     for (int i = 0; i < nodeNum; i++) {
         p[i].dist = INFINITE; //set the distance to infinite to the vertex from start node
         p[i].isKnown = false;
@@ -324,7 +355,6 @@ void DiGraph::Dijkstra(int start) {
     //    bool flag = false;
     while (true) {
         bool ok = true; //表示是否全部ok
-
         for (int i = 0; i < nodeNum; i++) {
             //只要有一个顶点的最短路径未知,ok就设置为false
             if (!p[i].isKnown) {
@@ -332,13 +362,11 @@ void DiGraph::Dijkstra(int start) {
                 break;
             }
         }
-        //           cout << " ok is ~~~~~~~~~~~~~~:   " <<ok<< endl;
         if (ok) return;
         int minIndex = -1;
         /*find the vertex's index, who has the shortest distance and was not known
          */
         for (int i = 0; i < nodeNum; i++) {
-
             if (!p[i].isKnown) {
                 if (minIndex == -1)
                     minIndex = i;
@@ -351,7 +379,6 @@ void DiGraph::Dijkstra(int start) {
         arcNode*tempD = p[minIndex].link; //each loop the vertex who has 
         //the shortest distant is set by isKnown=true;
         while (tempD!=0 ) {
-            cout << "~~~~~~test2" << endl;
             end = tempD->desVertex + 1; //destination vertex;
             begin = minIndex + 1;
             /*比较end点的disk ，如果从begin点出发的弧线权值加上
@@ -362,9 +389,7 @@ void DiGraph::Dijkstra(int start) {
                 p[end - 1].preNode = minIndex;
             }
             tempD = tempD->next;
-            cout << "~~~~~~~~test3" << endl;
-            //            cout << "end the loop" << endl;
-        }cout<<"~~~~~~~~~~~~test4"<<endl;
+        }
     }
     cout << "end suanfa " << endl;
 }

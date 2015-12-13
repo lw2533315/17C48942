@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
     cout << "Druskals " << endl;
     g.Kruskals();
     cout << "=============================" << endl;
-    cout << "Dijkstra..." << endl;
+    cout << "Dijkstra..shortest distance." << endl;
     cout << "input the start vertex" << endl;
     int input;
     cin>>input;
