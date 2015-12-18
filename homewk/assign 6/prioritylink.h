@@ -31,12 +31,7 @@ public:
     //    Prioritylink(int);
 
     ~Prioritylink() {
-        //        for(int i=0;i<listSize;i++){
-        //             Node*temp = front;
-        //             front = front->nNext;
-        //            delete temp;
-        //            
-        //        }
+        
         while (front != 0) {
             //        for(int i=0;i<listSize;i++){
             temp = front;
